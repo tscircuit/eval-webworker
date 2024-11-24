@@ -15,7 +15,7 @@ import { createCircuitWebWorker } from "@tscircuit/eval-webworker"
 
 const circuitWebWorker = createCircuitWebWorker()
 
-circuitWebWorker.execute(`
+await circuitWebWorker.execute(`
 import { RedLed } from "@tsci/red-led"
 
 circuit.add(
@@ -37,3 +37,13 @@ freezes during the render loop due to autorouting or other computationally
 intensive operations. Executing tscircuit code in a web worker allows the ui
 to display the rendering process without freezing, and stop rendering if it
 goes on for too long.
+
+## Execution Implementation
+
+1. The execution code is scanned for imports, these imports are then loaded
+   via fetch from the CDN and added to a global import map.
+2. The code is transpiled. Imports/requires automatically check the import map.
+3. The transpiled code is executed with a `circuit` object added to the global
+   scope.
+4. When a user calls `circuitWebWorker.renderUntilSettled()`, the web worker
+   the webworker runs `circuit.renderUntilSettled()`
