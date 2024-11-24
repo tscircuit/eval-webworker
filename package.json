@@ -1,0 +1,15 @@
+{
+  "name": "eval-webworker",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@tscircuit/core": "^0.0.199",
+    "@types/bun": "latest",
+    "@types/react": "^18.3.12",
+    "react": "^18.3.1"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
