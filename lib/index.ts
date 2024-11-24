@@ -1,4 +1,5 @@
 import type { AnyCircuitElement } from "circuit-json"
+import * as Comlink from "comlink"
 
 export type CircuitWebWorker = {
   execute: (code: string) => Promise<void>
@@ -8,5 +9,7 @@ export type CircuitWebWorker = {
 
 export const createCircuitWebWorker = (): CircuitWebWorker => {
   // TODO implement
-  return {}
+  return Comlink.wrap(
+    new Worker(new URL("../webworker/index.ts", import.meta.url)),
+  )
 }
