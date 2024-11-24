@@ -9,6 +9,10 @@ import { getImportsFromCode } from "@tscircuit/prompt-benchmarks/code-runner-uti
 
 let circuit: any = null
 
+const webWorkerConfiguration: WebWorkerConfiguration = {
+  snippetsApiBaseUrl: "https://snippets.tscircuit.com",
+}
+
 function evalCompiledJs(compiledCode: string) {
   const functionBody = `
     var exports = {};
@@ -34,12 +38,15 @@ const preSuppliedImports: Record<string, any> = {
 globalThis.React = React
 
 const webWorkerApi: WebWorkerApi = {
+  setSnippetsApiBaseUrl: async (baseUrl: string) => {
+    webWorkerConfiguration.snippetsApiBaseUrl = baseUrl
+  },
   execute: async (code: string): Promise<void> => {
     const tsciImportNames = getImportsFromCode(code).filter((imp) =>
       imp.startsWith("@tsci/"),
     )
 
-    for (const importName of importNames) {
+    for (const importName of tsciImportNames) {
       if (!preSuppliedImports[importName]) {
         // Import from
       }
