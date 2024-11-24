@@ -5,6 +5,7 @@ import * as Babel from "@babel/standalone"
 import * as tscircuitCore from "@tscircuit/core"
 import * as React from "react"
 import * as jscadFiber from "jscad-fiber"
+import { getImportsFromCode } from "@tscircuit/prompt-benchmarks/code-runner-utils"
 
 let circuit: any = null
 
@@ -20,10 +21,9 @@ function evalCompiledJs(compiledCode: string) {
 
 const preSuppliedImports: Record<string, any> = {
   "@tscircuit/core": tscircuitCore,
-  "react": React,
-  "jscad-fiber": jscadFiber
+  react: React,
+  "jscad-fiber": jscadFiber,
 }
-
 ;(globalThis as any).__tscircuit_require = (name: string) => {
   if (!preSuppliedImports[name]) {
     throw new Error(`Import "${name}" not found`)
@@ -35,6 +35,16 @@ globalThis.React = React
 
 const webWorkerApi: WebWorkerApi = {
   execute: async (code: string): Promise<void> => {
+    const tsciImportNames = getImportsFromCode(code).filter((imp) =>
+      imp.startsWith("@tsci/"),
+    )
+
+    for (const importName of importNames) {
+      if (!preSuppliedImports[importName]) {
+        // Import from
+      }
+    }
+
     // Create new circuit instance
     circuit = new tscircuitCore.Circuit()
     ;(globalThis as any).circuit = circuit
