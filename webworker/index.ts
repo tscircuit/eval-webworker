@@ -1,6 +1,9 @@
 import type { AnyCircuitElement } from "circuit-json"
 import * as Comlink from "comlink"
-import type { WebWorkerApi, WebWorkerConfiguration } from "lib/shared/types"
+import type {
+  InternalWebWorkerApi,
+  WebWorkerConfiguration,
+} from "lib/shared/types"
 import * as Babel from "@babel/standalone"
 import * as tscircuitCore from "@tscircuit/core"
 import * as React from "react"
@@ -74,7 +77,7 @@ const preSuppliedImports: Record<string, any> = {
 
 globalThis.React = React
 
-const webWorkerApi: WebWorkerApi = {
+const webWorkerApi: InternalWebWorkerApi = {
   setSnippetsApiBaseUrl: async (baseUrl: string) => {
     webWorkerConfiguration.snippetsApiBaseUrl = baseUrl
   },

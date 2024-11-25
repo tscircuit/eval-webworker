@@ -1,15 +1,26 @@
 import type { AnyCircuitElement } from "circuit-json"
 import * as Comlink from "comlink"
+import type {
+  InternalWebWorkerApi,
+  WebWorkerConfiguration,
+  CircuitWebWorker,
+} from "./shared/types"
 
-export type CircuitWebWorker = {
-  execute: (code: string) => Promise<void>
-  renderUntilSettled: () => Promise<void>
-  getCircuitJson: () => Promise<AnyCircuitElement[]>
-}
-
-export const createCircuitWebWorker = (): CircuitWebWorker => {
+export const createCircuitWebWorker = async (
+  configuration: Partial<WebWorkerConfiguration>,
+): Promise<CircuitWebWorker> => {
   // TODO implement
-  return Comlink.wrap(
-    new Worker(new URL("../webworker/index.ts", import.meta.url)),
+  const webWorker = Comlink.wrap<InternalWebWorkerApi>(
+    new Worker(
+      configuration.webWorkerUrl ??
+        "https://unpkg.com/@tscircuit/eval-webworker/dist/webworker/index.js",
+    ),
   )
+  if (configuration.snippetsApiBaseUrl) {
+    await webWorker.setSnippetsApiBaseUrl(configuration.snippetsApiBaseUrl)
+  }
+
+  // TODO set up listeners to track render state
+
+  return webWorker as any
 }

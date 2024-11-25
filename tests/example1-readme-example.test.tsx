@@ -2,7 +2,9 @@ import { createCircuitWebWorker } from "lib"
 import { expect, test } from "bun:test"
 
 test("example1-readme-example", async () => {
-  const circuitWebWorker = createCircuitWebWorker()
+  const circuitWebWorker = createCircuitWebWorker({
+    webWorkerUrl: new URL("../webworker/index.ts", import.meta.url),
+  })
 
   await circuitWebWorker.execute(`
   import { RedLed } from "@tsci/seveibar.red-led"
