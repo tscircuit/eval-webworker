@@ -1,6 +1,6 @@
 import type { AnyCircuitElement } from "circuit-json"
 import * as Comlink from "comlink"
-import type { WebWorkerApi } from "lib/shared/types"
+import type { WebWorkerApi, WebWorkerConfiguration } from "lib/shared/types"
 import * as Babel from "@babel/standalone"
 import * as tscircuitCore from "@tscircuit/core"
 import * as React from "react"
@@ -10,7 +10,7 @@ import { getImportsFromCode } from "@tscircuit/prompt-benchmarks/code-runner-uti
 let circuit: any = null
 
 const webWorkerConfiguration: WebWorkerConfiguration = {
-  snippetsApiBaseUrl: "https://snippets.tscircuit.com",
+  snippetsApiBaseUrl: "https://registry-api.tscircuit.com",
 }
 
 function evalCompiledJs(compiledCode: string) {
@@ -21,6 +21,43 @@ function evalCompiledJs(compiledCode: string) {
     ${compiledCode};
     return module;`.trim()
   return Function(functionBody).call(globalThis)
+}
+
+async function addImport(importName: string, depth = 0) {
+  if (!importName.startsWith("@tsci/")) return
+  if (preSuppliedImports[importName]) return
+  if (depth > 5) {
+    console.log("Max depth for imports reached")
+    return
+  }
+
+  const fullSnippetName = importName.replace("@tsci/", "").replace(".", "/")
+  const { snippet: importedSnippet, error } = await fetch(
+    `${webWorkerConfiguration.snippetsApiBaseUrl}/snippets/get?name=${fullSnippetName}`,
+  )
+    .then((res) => res.json())
+    .catch((e) => ({ error: e }))
+
+  if (error) {
+    console.error("Error fetching import", importName, error)
+    return
+  }
+
+  const { compiled_js, code } = importedSnippet
+
+  const importNames = getImportsFromCode(code!)
+
+  for (const importName of importNames) {
+    if (!preSuppliedImports[importName]) {
+      await addImport(importName, depth + 1)
+    }
+  }
+
+  try {
+    preSuppliedImports[importName] = evalCompiledJs(compiled_js).exports
+  } catch (e) {
+    console.error("Error importing snippet", e)
+  }
 }
 
 const preSuppliedImports: Record<string, any> = {
@@ -48,7 +85,7 @@ const webWorkerApi: WebWorkerApi = {
 
     for (const importName of tsciImportNames) {
       if (!preSuppliedImports[importName]) {
-        // Import from
+        await addImport(importName)
       }
     }
 

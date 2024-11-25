@@ -16,7 +16,7 @@ import { createCircuitWebWorker } from "@tscircuit/eval-webworker"
 const circuitWebWorker = createCircuitWebWorker()
 
 await circuitWebWorker.execute(`
-import { RedLed } from "@tsci/red-led"
+import { RedLed } from "@tsci/seveibar.red-led"
 
 circuit.add(
   <board width="10mm" height="10mm">

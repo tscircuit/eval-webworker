@@ -5,11 +5,11 @@ test("example1-readme-example", async () => {
   const circuitWebWorker = createCircuitWebWorker()
 
   await circuitWebWorker.execute(`
-  import { RedLed } from "@tsci/red-led"
+  import { RedLed } from "@tsci/seveibar.red-led"
 
   circuit.add(
     <board width="10mm" height="10mm">
-      <RedLed />
+      <RedLed name="LED1" />
     </board>
   )
   `)
@@ -18,6 +18,9 @@ test("example1-readme-example", async () => {
 
   const circuitJson = await circuitWebWorker.getCircuitJson()
 
-  console.log(circuitJson)
   expect(circuitJson).toBeDefined()
+
+  const led = circuitJson.find((el: any) => el.name === "LED1")
+  expect(led).toBeDefined()
+  expect(led?.type).toBe("source_component")
 })
