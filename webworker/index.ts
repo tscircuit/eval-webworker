@@ -11,6 +11,7 @@ import * as jscadFiber from "jscad-fiber"
 import { getImportsFromCode } from "@tscircuit/prompt-benchmarks/code-runner-utils"
 
 let circuit: any = null
+const pendingEventListeners: Array<[string, (...args: any[]) => void]> = []
 
 const webWorkerConfiguration: WebWorkerConfiguration = {
   snippetsApiBaseUrl: "https://registry-api.tscircuit.com",
@@ -107,10 +108,11 @@ const webWorkerApi: InternalWebWorkerApi = {
   },
 
   on: (event: string, callback: (...args: any[]) => void) => {
-    if (!circuit) {
-      throw new Error("No circuit has been created")
+    if (circuit) {
+      circuit.on(event, callback)
+    } else {
+      pendingEventListeners.push([event, callback])
     }
-    circuit.on(event, callback)
   },
 
   execute: async (code: string): Promise<void> => {
@@ -146,7 +148,11 @@ const webWorkerApi: InternalWebWorkerApi = {
       throw new Error(`Execution error: ${error.message}`)
     }
 
-    // Circuit events are now handled directly through the circuit instance
+    // Attach any pending event listeners
+    pendingEventListeners.forEach(([event, callback]) => {
+      circuit.on(event, callback)
+    })
+    pendingEventListeners.length = 0 // Clear the queue
   },
 
   renderUntilSettled: async (): Promise<void> => {
