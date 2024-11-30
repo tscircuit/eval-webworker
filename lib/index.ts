@@ -26,7 +26,9 @@ export const createCircuitWebWorker = async (
     renderUntilSettled: webWorker.renderUntilSettled.bind(webWorker),
     getCircuitJson: webWorker.getCircuitJson.bind(webWorker),
     on: (event: string, callback: (...args: any[]) => void) => {
-      webWorker.on(event, Comlink.proxy(callback))
+      console.log("Registering event listener for:", event)
+      const proxiedCallback = Comlink.proxy(callback)
+      webWorker.on(event, proxiedCallback)
     }
   }
   

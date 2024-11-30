@@ -10,6 +10,31 @@ import * as React from "react"
 import * as jscadFiber from "jscad-fiber"
 import { getImportsFromCode } from "@tscircuit/prompt-benchmarks/code-runner-utils"
 
+class WebWorkerEventEmitter {
+  private listeners: Record<string, Array<(...args: any[]) => void>> = {}
+
+  on(event: string, callback: (...args: any[]) => void) {
+    if (!this.listeners[event]) {
+      this.listeners[event] = []
+    }
+    this.listeners[event].push(callback)
+  }
+
+  emit(event: string, ...args: any[]) {
+    // console.log("WebWorkerEventEmitter.emit:", event, "Listeners:", Object.keys(this.listeners))
+    if (!this.listeners[event]) return
+    this.listeners[event].forEach(listener => {
+      try {
+        listener(...args)
+      } catch (error) {
+        console.error(`Error in event listener for ${event}:`, error)
+      }
+    })
+  }
+}
+
+const globalEventEmitter = new WebWorkerEventEmitter()
+
 let circuit: any = null
 const pendingEventListeners: Array<[string, (...args: any[]) => void]> = []
 
@@ -78,41 +103,9 @@ const preSuppliedImports: Record<string, any> = {
 
 globalThis.React = React
 
-class WebWorkerEventEmitter {
-  private listeners: Record<string, Array<(...args: any[]) => void>> = {}
-
-  on(event: string, callback: (...args: any[]) => void) {
-    if (!this.listeners[event]) {
-      this.listeners[event] = []
-    }
-    this.listeners[event].push(callback)
-  }
-
-  emit(event: string, ...args: any[]) {
-    if (!this.listeners[event]) return
-    this.listeners[event].forEach(listener => {
-      try {
-        listener(...args)
-      } catch (error) {
-        console.error(`Error in event listener for ${event}:`, error)
-      }
-    })
-  }
-}
-
-const webWorkerEventEmitter = new WebWorkerEventEmitter()
-
 const webWorkerApi: InternalWebWorkerApi = {
   setSnippetsApiBaseUrl: async (baseUrl: string) => {
     webWorkerConfiguration.snippetsApiBaseUrl = baseUrl
-  },
-
-  on: (event: string, callback: (...args: any[]) => void) => {
-    if (circuit) {
-      circuit.on(event, callback)
-    } else {
-      pendingEventListeners.push([event, callback])
-    }
   },
 
   execute: async (code: string): Promise<void> => {
@@ -129,6 +122,15 @@ const webWorkerApi: InternalWebWorkerApi = {
     // Create new circuit instance
     circuit = new tscircuitCore.Circuit()
     ;(globalThis as any).circuit = circuit
+
+    // Override circuit's emit method to use global event emitter
+    const originalEmit = circuit.emit.bind(circuit)
+    circuit.emit = (event: string, ...args: any[]) => {
+      // Re-emit all circuit events through global event emitter
+      // console.log("Circuit emitting event:", event)
+      globalEventEmitter.emit(event, ...args)
+      originalEmit(event, ...args)
+    }
 
     // Transform code
     const result = Babel.transform(code, {
@@ -147,12 +149,10 @@ const webWorkerApi: InternalWebWorkerApi = {
     } catch (error: any) {
       throw new Error(`Execution error: ${error.message}`)
     }
+  },
 
-    // Attach any pending event listeners
-    pendingEventListeners.forEach(([event, callback]) => {
-      circuit.on(event, callback)
-    })
-    pendingEventListeners.length = 0 // Clear the queue
+  on: (event: string, callback: (...args: any[]) => void) => {
+    globalEventEmitter.on(event, callback)
   },
 
   renderUntilSettled: async (): Promise<void> => {
