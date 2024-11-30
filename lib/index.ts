@@ -22,5 +22,7 @@ export const createCircuitWebWorker = async (
 
   // TODO set up listeners to track render state
 
+  console.log(webWorker)
+
   return webWorker as any
 }

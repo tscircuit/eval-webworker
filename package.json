@@ -1,6 +1,7 @@
 {
-  "name": "eval-webworker",
+  "name": "@tscircuit/eval-webworker",
   "main": "dist/lib/index.js",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "build": "tsup-node ./lib/index.ts ./webworker/index.ts --format esm --sourcemap"

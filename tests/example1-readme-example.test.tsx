@@ -2,7 +2,7 @@ import { createCircuitWebWorker } from "lib"
 import { expect, test } from "bun:test"
 
 test("example1-readme-example", async () => {
-  const circuitWebWorker = createCircuitWebWorker({
+  const circuitWebWorker = await createCircuitWebWorker({
     webWorkerUrl: new URL("../webworker/index.ts", import.meta.url),
   })
 
