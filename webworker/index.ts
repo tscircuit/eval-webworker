@@ -77,10 +77,39 @@ const preSuppliedImports: Record<string, any> = {
 
 globalThis.React = React
 
+class WebWorkerEventEmitter {
+  private listeners: Record<string, Array<(...args: any[]) => void>> = {}
+
+  on(event: string, callback: (...args: any[]) => void) {
+    if (!this.listeners[event]) {
+      this.listeners[event] = []
+    }
+    this.listeners[event].push(callback)
+  }
+
+  emit(event: string, ...args: any[]) {
+    if (!this.listeners[event]) return
+    this.listeners[event].forEach(listener => {
+      try {
+        listener(...args)
+      } catch (error) {
+        console.error(`Error in event listener for ${event}:`, error)
+      }
+    })
+  }
+}
+
+const webWorkerEventEmitter = new WebWorkerEventEmitter()
+
 const webWorkerApi: InternalWebWorkerApi = {
   setSnippetsApiBaseUrl: async (baseUrl: string) => {
     webWorkerConfiguration.snippetsApiBaseUrl = baseUrl
   },
+
+  on: (event: string, callback: (...args: any[]) => void) => {
+    webWorkerEventEmitter.on(event, callback)
+  },
+
   execute: async (code: string): Promise<void> => {
     const tsciImportNames = getImportsFromCode(code).filter((imp) =>
       imp.startsWith("@tsci/"),
@@ -112,6 +141,18 @@ const webWorkerApi: InternalWebWorkerApi = {
       evalCompiledJs(result.code)
     } catch (error: any) {
       throw new Error(`Execution error: ${error.message}`)
+    }
+
+    if (circuit) {
+      // Listen to all render lifecycle events and re-emit them
+      circuit.on("renderable:renderLifecycle:anyEvent", (eventData: { type: string }) => {
+        webWorkerEventEmitter.emit("renderable:renderLifecycle:anyEvent", eventData)
+      })
+
+      // Also re-emit async effect completion
+      circuit.on("asyncEffectComplete", (data: any) => {
+        webWorkerEventEmitter.emit('asyncEffectComplete', data)
+      })
     }
   },
 
