@@ -107,7 +107,10 @@ const webWorkerApi: InternalWebWorkerApi = {
   },
 
   on: (event: string, callback: (...args: any[]) => void) => {
-    webWorkerEventEmitter.on(event, callback)
+    if (!circuit) {
+      throw new Error("No circuit has been created")
+    }
+    circuit.on(event, callback)
   },
 
   execute: async (code: string): Promise<void> => {
@@ -143,17 +146,7 @@ const webWorkerApi: InternalWebWorkerApi = {
       throw new Error(`Execution error: ${error.message}`)
     }
 
-    if (circuit) {
-      // Listen to all render lifecycle events and re-emit them
-      circuit.on("renderable:renderLifecycle:anyEvent", (eventData: { type: string }) => {
-        webWorkerEventEmitter.emit("renderable:renderLifecycle:anyEvent", eventData)
-      })
-
-      // Also re-emit async effect completion
-      circuit.on("asyncEffectComplete", (data: any) => {
-        webWorkerEventEmitter.emit('asyncEffectComplete', data)
-      })
-    }
+    // Circuit events are now handled directly through the circuit instance
   },
 
   renderUntilSettled: async (): Promise<void> => {

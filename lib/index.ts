@@ -20,5 +20,15 @@ export const createCircuitWebWorker = async (
     await webWorker.setSnippetsApiBaseUrl(configuration.snippetsApiBaseUrl)
   }
   
-  return webWorker as CircuitWebWorker
+  // Create a wrapper that handles events directly through circuit instance
+  const wrapper: CircuitWebWorker = {
+    execute: webWorker.execute.bind(webWorker),
+    renderUntilSettled: webWorker.renderUntilSettled.bind(webWorker),
+    getCircuitJson: webWorker.getCircuitJson.bind(webWorker),
+    on: (event: string, callback: (...args: any[]) => void) => {
+      webWorker.on(event, Comlink.proxy(callback))
+    }
+  }
+  
+  return wrapper
 }
