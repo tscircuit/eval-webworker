@@ -10,13 +10,19 @@ test("circuit-web-worker-events", async () => {
   })
 
   // Listen to events
-  circuitWebWorker.on("renderable:renderLifecycle:PcbComponentRender:start", (eventData) => {
-    capturedEvents.push("pcbComponentRenderStart")
-  })
+  circuitWebWorker.on(
+    "renderable:renderLifecycle:PcbComponentRender:start",
+    (eventData) => {
+      capturedEvents.push("pcbComponentRenderStart")
+    },
+  )
 
-  circuitWebWorker.on("renderable:renderLifecycle:PcbComponentRender:end", (eventData) => {
-    capturedEvents.push("pcbComponentRenderEnd")
-  })
+  circuitWebWorker.on(
+    "renderable:renderLifecycle:PcbComponentRender:end",
+    (eventData) => {
+      capturedEvents.push("pcbComponentRenderEnd")
+    },
+  )
 
   // Execute a simple circuit with a Red LED
   await circuitWebWorker.execute(`

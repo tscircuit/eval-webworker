@@ -15,22 +15,21 @@ export const createCircuitWebWorker = async (
         "https://unpkg.com/@tscircuit/eval-webworker/dist/webworker/index.js",
     ),
   )
-  
+
   if (configuration.snippetsApiBaseUrl) {
     await webWorker.setSnippetsApiBaseUrl(configuration.snippetsApiBaseUrl)
   }
-  
+
   // Create a wrapper that handles events directly through circuit instance
   const wrapper: CircuitWebWorker = {
     execute: webWorker.execute.bind(webWorker),
     renderUntilSettled: webWorker.renderUntilSettled.bind(webWorker),
     getCircuitJson: webWorker.getCircuitJson.bind(webWorker),
     on: (event: string, callback: (...args: any[]) => void) => {
-      console.log("Registering event listener for:", event)
       const proxiedCallback = Comlink.proxy(callback)
       webWorker.on(event, proxiedCallback)
-    }
+    },
   }
-  
+
   return wrapper
 }

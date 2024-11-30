@@ -21,9 +21,8 @@ class WebWorkerEventEmitter {
   }
 
   emit(event: string, ...args: any[]) {
-    // console.log("WebWorkerEventEmitter.emit:", event, "Listeners:", Object.keys(this.listeners))
     if (!this.listeners[event]) return
-    this.listeners[event].forEach(listener => {
+    this.listeners[event].forEach((listener) => {
       try {
         listener(...args)
       } catch (error) {
@@ -127,7 +126,6 @@ const webWorkerApi: InternalWebWorkerApi = {
     const originalEmit = circuit.emit.bind(circuit)
     circuit.emit = (event: string, ...args: any[]) => {
       // Re-emit all circuit events through global event emitter
-      // console.log("Circuit emitting event:", event)
       globalEventEmitter.emit(event, ...args)
       originalEmit(event, ...args)
     }
