@@ -1,3 +1,4 @@
+import { EventEmitter } from "events"
 import type { AnyCircuitElement } from "circuit-json"
 import * as Comlink from "comlink"
 import type {
@@ -10,32 +11,10 @@ import * as React from "react"
 import * as jscadFiber from "jscad-fiber"
 import { getImportsFromCode } from "@tscircuit/prompt-benchmarks/code-runner-utils"
 
-class WebWorkerEventEmitter {
-  private listeners: Record<string, Array<(...args: any[]) => void>> = {}
-
-  on(event: string, callback: (...args: any[]) => void) {
-    if (!this.listeners[event]) {
-      this.listeners[event] = []
-    }
-    this.listeners[event].push(callback)
-  }
-
-  emit(event: string, ...args: any[]) {
-    if (!this.listeners[event]) return
-    this.listeners[event].forEach((listener) => {
-      try {
-        listener(...args)
-      } catch (error) {
-        console.error(`Error in event listener for ${event}:`, error)
-      }
-    })
-  }
-}
-
-const globalEventEmitter = new WebWorkerEventEmitter()
+// Use Node's built-in EventEmitter
+const eventEmitter = new EventEmitter()
 
 let circuit: any = null
-const pendingEventListeners: Array<[string, (...args: any[]) => void]> = []
 
 const webWorkerConfiguration: WebWorkerConfiguration = {
   snippetsApiBaseUrl: "https://registry-api.tscircuit.com",
@@ -122,11 +101,10 @@ const webWorkerApi: InternalWebWorkerApi = {
     circuit = new tscircuitCore.Circuit()
     ;(globalThis as any).circuit = circuit
 
-    // Override circuit's emit method to use global event emitter
     const originalEmit = circuit.emit.bind(circuit)
     circuit.emit = (event: string, ...args: any[]) => {
-      // Re-emit all circuit events through global event emitter
-      globalEventEmitter.emit(event, ...args)
+      // Re-emit all circuit events through event emitter
+      eventEmitter.emit(event, ...args)
       originalEmit(event, ...args)
     }
 
@@ -150,7 +128,7 @@ const webWorkerApi: InternalWebWorkerApi = {
   },
 
   on: (event: string, callback: (...args: any[]) => void) => {
-    globalEventEmitter.on(event, callback)
+    eventEmitter.on(event, callback)
   },
 
   renderUntilSettled: async (): Promise<void> => {
