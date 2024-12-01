@@ -9,6 +9,15 @@ test("circuit-web-worker-events", async () => {
     webWorkerUrl: new URL("../webworker/index.ts", import.meta.url),
   })
 
+  await circuitWebWorker.execute(`
+  import { RedLed } from "@tsci/seveibar.red-led"
+  circuit.add(
+    <board width="10mm" height="10mm">
+      <RedLed name="LED1" x="5mm" y="5mm" />
+    </board>
+  )
+  `)
+
   // Listen to events
   circuitWebWorker.on(
     "renderable:renderLifecycle:PcbComponentRender:start",
@@ -23,16 +32,6 @@ test("circuit-web-worker-events", async () => {
       capturedEvents.push("pcbComponentRenderEnd")
     },
   )
-
-  // Execute a simple circuit with a Red LED
-  await circuitWebWorker.execute(`
-  import { RedLed } from "@tsci/seveibar.red-led"
-  circuit.add(
-    <board width="10mm" height="10mm">
-      <RedLed name="LED1" x="5mm" y="5mm" />
-    </board>
-  )
-  `)
 
   // Render until settled to trigger events
   await circuitWebWorker.renderUntilSettled()

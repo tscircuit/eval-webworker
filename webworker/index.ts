@@ -1,4 +1,3 @@
-import { EventEmitter } from "events"
 import type { AnyCircuitElement } from "circuit-json"
 import * as Comlink from "comlink"
 import type {
@@ -10,9 +9,6 @@ import * as tscircuitCore from "@tscircuit/core"
 import * as React from "react"
 import * as jscadFiber from "jscad-fiber"
 import { getImportsFromCode } from "@tscircuit/prompt-benchmarks/code-runner-utils"
-
-// Use Node's built-in EventEmitter
-const eventEmitter = new EventEmitter()
 
 let circuit: any = null
 
@@ -101,13 +97,6 @@ const webWorkerApi: InternalWebWorkerApi = {
     circuit = new tscircuitCore.Circuit()
     ;(globalThis as any).circuit = circuit
 
-    const originalEmit = circuit.emit.bind(circuit)
-    circuit.emit = (event: string, ...args: any[]) => {
-      // Re-emit all circuit events through event emitter
-      eventEmitter.emit(event, ...args)
-      originalEmit(event, ...args)
-    }
-
     // Transform code
     const result = Babel.transform(code, {
       presets: ["react", "typescript"],
@@ -128,7 +117,10 @@ const webWorkerApi: InternalWebWorkerApi = {
   },
 
   on: (event: string, callback: (...args: any[]) => void) => {
-    eventEmitter.on(event, callback)
+    if (!circuit) {
+      throw new Error("No circuit has been created")
+    }
+    circuit.on(event, callback)
   },
 
   renderUntilSettled: async (): Promise<void> => {
