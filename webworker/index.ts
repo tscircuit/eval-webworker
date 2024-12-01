@@ -81,6 +81,7 @@ const webWorkerApi: InternalWebWorkerApi = {
   setSnippetsApiBaseUrl: async (baseUrl: string) => {
     webWorkerConfiguration.snippetsApiBaseUrl = baseUrl
   },
+
   execute: async (code: string): Promise<void> => {
     const tsciImportNames = getImportsFromCode(code).filter((imp) =>
       imp.startsWith("@tsci/"),
@@ -113,6 +114,13 @@ const webWorkerApi: InternalWebWorkerApi = {
     } catch (error: any) {
       throw new Error(`Execution error: ${error.message}`)
     }
+  },
+
+  on: (event: string, callback: (...args: any[]) => void) => {
+    if (!circuit) {
+      throw new Error("No circuit has been created")
+    }
+    circuit.on(event, callback)
   },
 
   renderUntilSettled: async (): Promise<void> => {

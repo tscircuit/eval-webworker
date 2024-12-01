@@ -9,20 +9,27 @@ import type {
 export const createCircuitWebWorker = async (
   configuration: Partial<WebWorkerConfiguration>,
 ): Promise<CircuitWebWorker> => {
-  // TODO implement
   const webWorker = Comlink.wrap<InternalWebWorkerApi>(
     new Worker(
       configuration.webWorkerUrl ??
         "https://unpkg.com/@tscircuit/eval-webworker/dist/webworker/index.js",
     ),
   )
+
   if (configuration.snippetsApiBaseUrl) {
     await webWorker.setSnippetsApiBaseUrl(configuration.snippetsApiBaseUrl)
   }
 
-  // TODO set up listeners to track render state
+  // Create a wrapper that handles events directly through circuit instance
+  const wrapper: CircuitWebWorker = {
+    execute: webWorker.execute.bind(webWorker),
+    renderUntilSettled: webWorker.renderUntilSettled.bind(webWorker),
+    getCircuitJson: webWorker.getCircuitJson.bind(webWorker),
+    on: (event: string, callback: (...args: any[]) => void) => {
+      const proxiedCallback = Comlink.proxy(callback)
+      webWorker.on(event, proxiedCallback)
+    },
+  }
 
-  console.log(webWorker)
-
-  return webWorker as any
+  return wrapper
 }
