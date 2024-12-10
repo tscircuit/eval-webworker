@@ -1,10 +1,10 @@
-import { createCircuitWebWorker } from "lib";
-import { expect, test } from "bun:test";
+import { createCircuitWebWorker } from "lib"
+import { expect, test } from "bun:test"
 
 test("virtual filesystem with components", async () => {
   const circuitWebWorker = await createCircuitWebWorker({
     webWorkerUrl: new URL("../webworker/index.ts", import.meta.url),
-  });
+  })
 
   await circuitWebWorker.executeWithFs({
     fsMap: {
@@ -26,14 +26,14 @@ test("virtual filesystem with components", async () => {
       `,
     },
     entrypoint: "main.tsx",
-  });
+  })
 
-  await circuitWebWorker.renderUntilSettled();
+  await circuitWebWorker.renderUntilSettled()
 
-  const circuitJson = await circuitWebWorker.getCircuitJson();
-  expect(circuitJson).toBeDefined();
+  const circuitJson = await circuitWebWorker.getCircuitJson()
+  expect(circuitJson).toBeDefined()
 
-  const led = circuitJson.find((el: any) => el.name === "LED1");
-  expect(led).toBeDefined();
-  expect(led?.type).toBe("source_component");
-});
+  const led = circuitJson.find((el: any) => el.name === "LED1")
+  expect(led).toBeDefined()
+  expect(led?.type).toBe("source_component")
+})

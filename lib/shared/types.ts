@@ -1,22 +1,28 @@
-import type { AnyCircuitElement } from "circuit-json";
+import type { AnyCircuitElement } from "circuit-json"
 
 export interface WebWorkerConfiguration {
-  snippetsApiBaseUrl: string;
-  webWorkerUrl?: URL;
+  snippetsApiBaseUrl: string
+  webWorkerUrl?: URL
 }
 
 export interface InternalWebWorkerApi {
-  execute: (code: string) => Promise<void>;
-  renderUntilSettled: () => Promise<void>;
-  getCircuitJson: () => Promise<AnyCircuitElement[]>;
-  setSnippetsApiBaseUrl: (baseUrl: string) => Promise<void>;
-  on: (event: string, callback: (...args: any[]) => void) => void;
-  executeWithFs: (options: ExecuteWithFsOptions) => Promise<void>;
+  execute: (code: string) => Promise<void>
+  renderUntilSettled: () => Promise<void>
+  getCircuitJson: () => Promise<AnyCircuitElement[]>
+  setSnippetsApiBaseUrl: (baseUrl: string) => Promise<void>
+  on: (event: string, callback: (...args: any[]) => void) => void
+  executeWithFs: (options: ExecuteWithFsOptions) => Promise<void>
+}
+
+export interface ExecuteWithFsOptions {
+  fsMap: Record<string, any>
+  entrypoint: string
 }
 
 export type CircuitWebWorker = {
-  execute: (code: string) => Promise<void>;
-  renderUntilSettled: () => Promise<void>;
-  getCircuitJson: () => Promise<AnyCircuitElement[]>;
-  on: (event: string, callback: (...args: any[]) => void) => void;
-};
+  execute: (code: string) => Promise<void>
+  renderUntilSettled: () => Promise<void>
+  getCircuitJson: () => Promise<AnyCircuitElement[]>
+  on: (event: string, callback: (...args: any[]) => void) => void
+  executeWithFs: (options: ExecuteWithFsOptions) => Promise<void>
+}

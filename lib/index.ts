@@ -1,28 +1,28 @@
-import type { AnyCircuitElement } from "circuit-json";
-import * as Comlink from "comlink";
+import type { AnyCircuitElement } from "circuit-json"
+import * as Comlink from "comlink"
 import type {
   InternalWebWorkerApi,
   WebWorkerConfiguration,
   CircuitWebWorker,
-} from "./shared/types";
+} from "./shared/types"
 
 interface ExecuteWithFsOptions {
-  fsMap: Record<string, string>;
-  entrypoint: string;
+  fsMap: Record<string, string>
+  entrypoint: string
 }
 
 export const createCircuitWebWorker = async (
-  configuration: Partial<WebWorkerConfiguration>
+  configuration: Partial<WebWorkerConfiguration>,
 ): Promise<CircuitWebWorker> => {
   const webWorker = Comlink.wrap<InternalWebWorkerApi>(
     new Worker(
       configuration.webWorkerUrl ??
-        "https://unpkg.com/@tscircuit/eval-webworker/dist/webworker/index.js"
-    )
-  );
+        "https://unpkg.com/@tscircuit/eval-webworker/dist/webworker/index.js",
+    ),
+  )
 
   if (configuration.snippetsApiBaseUrl) {
-    await webWorker.setSnippetsApiBaseUrl(configuration.snippetsApiBaseUrl);
+    await webWorker.setSnippetsApiBaseUrl(configuration.snippetsApiBaseUrl)
   }
 
   // Create a wrapper that handles events directly through circuit instance
@@ -31,13 +31,13 @@ export const createCircuitWebWorker = async (
     renderUntilSettled: webWorker.renderUntilSettled.bind(webWorker),
     getCircuitJson: webWorker.getCircuitJson.bind(webWorker),
     on: (event: string, callback: (...args: any[]) => void) => {
-      const proxiedCallback = Comlink.proxy(callback);
-      webWorker.on(event, proxiedCallback);
+      const proxiedCallback = Comlink.proxy(callback)
+      webWorker.on(event, proxiedCallback)
     },
     async executeWithFs({ fsMap, entrypoint }: ExecuteWithFsOptions) {
-      return webWorker.executeWithFs({ fsMap, entrypoint });
+      return webWorker.executeWithFs({ fsMap, entrypoint })
     },
-  };
+  }
 
-  return wrapper;
-};
+  return wrapper
+}

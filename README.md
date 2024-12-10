@@ -11,9 +11,9 @@ scope. All imports from `@tsci/*` are automatically handled.
 ## Usage
 
 ```tsx
-import { createCircuitWebWorker } from "@tscircuit/eval-webworker"
+import { createCircuitWebWorker } from "@tscircuit/eval-webworker";
 
-const circuitWebWorker = createCircuitWebWorker()
+const circuitWebWorker = createCircuitWebWorker();
 
 await circuitWebWorker.execute(`
 import { RedLed } from "@tsci/seveibar.red-led"
@@ -23,11 +23,11 @@ circuit.add(
     <RedLed />
   </board>
 )
-`)
+`);
 
-await circuitWebWorker.renderUntilSettled()
+await circuitWebWorker.renderUntilSettled();
 
-const circuitJson = await circuitWebWorker.getCircuitJson()
+const circuitJson = await circuitWebWorker.getCircuitJson();
 ```
 
 ## Why use a web worker?
