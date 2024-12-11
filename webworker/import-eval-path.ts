@@ -10,9 +10,12 @@ export async function importEvalPath(
   ctx: ExecutionContext,
   depth = 0,
 ) {
+  console.log(`${"  ".repeat(depth)}➡️`, importName)
   const { preSuppliedImports } = ctx
 
   if (preSuppliedImports[importName]) return
+  if (importName.startsWith("./") && preSuppliedImports[importName.slice(2)])
+    return
 
   if (depth > 5) {
     console.log("Max depth for imports reached")

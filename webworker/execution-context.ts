@@ -21,6 +21,10 @@ export function createExecutionContext(
       "@tscircuit/core": tscircuitCore,
       react: React,
       "jscad-fiber": jscadFiber,
+
+      // This is usually used as a type import, we can remove the shim when we
+      // ignore type imports in getImportsFromCode
+      "@tscircuit/props": {},
     },
     circuit: new Circuit(),
     ...webWorkerConfiguration,

@@ -44,7 +44,6 @@ const webWorkerApi = {
   },
 
   async execute(code: string) {
-    console.log("execute")
     executionContext = createExecutionContext(webWorkerConfiguration)
     executionContext.fsMap["entrypoint.tsx"] = code
     ;(globalThis as any).__tscircuit_circuit = executionContext.circuit

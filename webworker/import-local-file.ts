@@ -17,7 +17,7 @@ export const importLocalFile = async (
   }
   const fileContent = fsMap[fsPath]
   if (fsPath.endsWith(".json")) {
-    preSuppliedImports[importName] = JSON.parse(fileContent)
+    preSuppliedImports[fsPath] = JSON.parse(fileContent)
   } else if (fsPath.endsWith(".tsx")) {
     const importNames = getImportsFromCode(fileContent)
 
@@ -38,12 +38,12 @@ export const importLocalFile = async (
     }
 
     try {
-      preSuppliedImports[fsPath] = evalCompiledJs(
-        result.code,
-        preSuppliedImports,
-      )
+      const importRunResult = evalCompiledJs(result.code, preSuppliedImports)
+      preSuppliedImports[fsPath] = importRunResult.exports
     } catch (error: any) {
-      throw new Error(`Eval compiled js error: ${error.message}`)
+      throw new Error(
+        `Eval compiled js error for "${importName}": ${error.message}`,
+      )
     }
   } else if (fsPath.endsWith(".js")) {
     // TODO get imports from js?

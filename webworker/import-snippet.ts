@@ -10,7 +10,6 @@ export async function importSnippet(
   ctx: ExecutionContext,
   depth = 0,
 ) {
-  console.log("importSnippet", importName)
   const { preSuppliedImports } = ctx
   const fullSnippetName = importName.replace("@tsci/", "").replace(".", "/")
   const { snippet: importedSnippet, error } = await fetch(
