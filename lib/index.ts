@@ -23,6 +23,7 @@ export const createCircuitWebWorker = async (
   // Create a wrapper that handles events directly through circuit instance
   const wrapper: CircuitWebWorker = {
     execute: webWorker.execute.bind(webWorker),
+    executeWithFsMap: webWorker.executeWithFsMap.bind(webWorker),
     renderUntilSettled: webWorker.renderUntilSettled.bind(webWorker),
     getCircuitJson: webWorker.getCircuitJson.bind(webWorker),
     on: (event: string, callback: (...args: any[]) => void) => {
