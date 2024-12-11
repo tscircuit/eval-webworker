@@ -30,6 +30,42 @@ await circuitWebWorker.renderUntilSettled()
 const circuitJson = await circuitWebWorker.getCircuitJson()
 ```
 
+## Using Virtual Filesystem
+
+You can also execute code using a virtual filesystem, which is useful when you have multiple files or components:
+
+```tsx
+import { createCircuitWebWorker } from "@tscircuit/eval-webworker"
+
+const circuitWebWorker = createCircuitWebWorker()
+
+await circuitWebWorker.executeWithFsMap({
+  fsMap: {
+    "entrypoint.tsx": `
+      import { MyLed } from "./myled.tsx"
+      
+      circuit.add(
+        <board width="10mm" height="10mm">
+          <MyLed name="LED1" />
+        </board>
+      )
+    `,
+    "myled.tsx": `
+      import { RedLed } from "@tsci/seveibar.red-led"
+      
+      export const MyLed = ({ name }) => {
+        return <RedLed name={name} />
+      }
+    `
+  },
+  entrypoint: "entrypoint.tsx"
+})
+
+await circuitWebWorker.renderUntilSettled()
+
+const circuitJson = await circuitWebWorker.getCircuitJson()
+```
+
 ## Why use a web worker?
 
 tscircuit can block the ui thread in a browser. In addition, tscircuit sometimes
