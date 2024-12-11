@@ -2,7 +2,7 @@ export function evalCompiledJs(
   compiledCode: string,
   preSuppliedImports: Record<string, any>,
 ) {
-  globalThis.__tscircuit_require = (name: string) => {
+  ;(globalThis as any).__tscircuit_require = (name: string) => {
     if (name.startsWith("./") && preSuppliedImports[name.slice(2)]) {
       return preSuppliedImports[name.slice(2)]
     }
