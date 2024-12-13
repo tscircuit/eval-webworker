@@ -8,8 +8,6 @@ test("example3-encoded-worker-url", async () => {
     webWorkerUrl: blobUrl,
   })
 
-  console.log("webworker loaded")
-
   await circuitWebWorker.execute(`
   import { RedLed } from "@tsci/seveibar.red-led"
 
@@ -19,7 +17,6 @@ test("example3-encoded-worker-url", async () => {
     </board>
   )
   `)
-  console.log("circuit executed")
 
   await circuitWebWorker.renderUntilSettled()
 
