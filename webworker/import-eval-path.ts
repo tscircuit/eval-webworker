@@ -11,7 +11,7 @@ export async function importEvalPath(
   depth = 0,
 ) {
   if (ctx.verbose) {
-    console.log(`[Worker] ${" ".repeat(depth * 2)}Importing:`, importName)
+    console.log(`[Worker] ${"  ".repeat(depth)}➡️`, importName)
   }
   const { preSuppliedImports } = ctx
 
