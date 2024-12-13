@@ -4,7 +4,9 @@
   "version": "0.0.18",
   "type": "module",
   "scripts": {
-    "build": "tsup-node ./lib/index.ts ./webworker/index.ts --format esm --sourcemap inline --dts && bun run build:blob-url",
+    "build": "bun run build:lib && bun run build:webworker && bun run build:blob-url",
+    "build:lib": "tsup-node ./lib/index.ts --format esm --sourcemap inline --dts -d dist/lib",
+    "build:webworker": "tsup ./webworker/index.ts --metafile ./metadata.json --format esm --sourcemap inline -d dist/webworker",
     "build:blob-url": "bun run ./scripts/build-worker-blob-url.ts",
     "format": "biome format --write .",
     "format:check": "biome format ."
