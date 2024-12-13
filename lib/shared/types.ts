@@ -2,7 +2,7 @@ import type { AnyCircuitElement } from "circuit-json"
 
 export interface WebWorkerConfiguration {
   snippetsApiBaseUrl: string
-  webWorkerUrl?: URL
+  webWorkerUrl?: URL | string
 }
 
 export interface InternalWebWorkerApi {

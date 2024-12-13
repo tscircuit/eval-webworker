@@ -29,6 +29,7 @@ const webWorkerApi = {
     entrypoint: string
     fsMap: Record<string, string>
   }): Promise<void> {
+    console.log("Running executeWithFsMap")
     executionContext = createExecutionContext(webWorkerConfiguration)
     executionContext.fsMap = normalizeFsMap(opts.fsMap)
     if (!executionContext.fsMap[opts.entrypoint]) {
@@ -44,6 +45,7 @@ const webWorkerApi = {
   },
 
   async execute(code: string) {
+    console.log("Running execute")
     executionContext = createExecutionContext(webWorkerConfiguration)
     executionContext.fsMap["entrypoint.tsx"] = code
     ;(globalThis as any).__tscircuit_circuit = executionContext.circuit
