@@ -13,6 +13,7 @@ export const createCircuitWebWorker = async (
     new Worker(
       configuration.webWorkerUrl ??
         "https://unpkg.com/@tscircuit/eval-webworker/dist/webworker/index.js",
+      { type: "module" },
     ),
   )
 
