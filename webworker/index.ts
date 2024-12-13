@@ -18,6 +18,7 @@ let executionContext: ExecutionContext | null = null
 
 const webWorkerConfiguration: WebWorkerConfiguration = {
   snippetsApiBaseUrl: "https://registry-api.tscircuit.com",
+  verbose: false,
 }
 
 const webWorkerApi = {
@@ -29,7 +30,12 @@ const webWorkerApi = {
     entrypoint: string
     fsMap: Record<string, string>
   }): Promise<void> {
-    console.log("Running executeWithFsMap")
+    if (webWorkerConfiguration.verbose) {
+      console.log("[Worker] executeWithFsMap called with:", {
+        entrypoint: opts.entrypoint,
+        fsMapKeys: Object.keys(opts.fsMap),
+      })
+    }
     executionContext = createExecutionContext(webWorkerConfiguration)
     executionContext.fsMap = normalizeFsMap(opts.fsMap)
     if (!executionContext.fsMap[opts.entrypoint]) {
@@ -45,50 +51,15 @@ const webWorkerApi = {
   },
 
   async execute(code: string) {
-    console.log("Running execute")
+    if (webWorkerConfiguration.verbose) {
+      console.log("[Worker] execute called with code length:", code.length)
+    }
     executionContext = createExecutionContext(webWorkerConfiguration)
     executionContext.fsMap["entrypoint.tsx"] = code
     ;(globalThis as any).__tscircuit_circuit = executionContext.circuit
 
     await importEvalPath("./entrypoint.tsx", executionContext)
   },
-
-  // async _executeWithContext(code: string) {
-  //   if (!executionContext) {
-  //     throw new Error("No execution context has been created")
-  //   }
-  //   const tsciImportNames = getImportsFromCode(code).filter((imp) =>
-  //     imp.startsWith("@tsci/"),
-  //   )
-
-  //   for (const importName of tsciImportNames) {
-  //     if (!preSuppliedImports[importName]) {
-  //       await importEvalPath(importName, executionContext)
-  //     }
-  //   }
-  //   // Create new circuit instance
-  //   ;(globalThis as any).circuit = executionContext.circuit
-
-  //   // Transform code
-  //   const result = Babel.transform(code, {
-  //     presets: ["react", "typescript"],
-  //     plugins: ["transform-modules-commonjs"],
-  //     filename: "virtual.tsx",
-  //   })
-
-  //   if (!result || !result.code) {
-  //     throw new Error("Failed to transform code")
-  //   }
-
-  //   console.log(Object.keys(preSuppliedImports))
-
-  //   // Execute transformed code
-  //   try {
-  //     evalCompiledJs(result.code, preSuppliedImports)
-  //   } catch (error: any) {
-  //     throw new Error(`Execution error: ${error.message}`)
-  //   }
-  // },
 
   on: (event: string, callback: (...args: any[]) => void) => {
     if (!executionContext) {

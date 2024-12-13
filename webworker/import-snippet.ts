@@ -12,6 +12,9 @@ export async function importSnippet(
 ) {
   const { preSuppliedImports } = ctx
   const fullSnippetName = importName.replace("@tsci/", "").replace(".", "/")
+  if (ctx.verbose) {
+    console.log(`[Worker] Importing snippet:`, fullSnippetName)
+  }
   const { snippet: importedSnippet, error } = await fetch(
     `${ctx.snippetsApiBaseUrl}/snippets/get?name=${fullSnippetName}`,
   )

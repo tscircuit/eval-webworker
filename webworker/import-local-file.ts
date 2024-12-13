@@ -12,6 +12,9 @@ export const importLocalFile = async (
   const { fsMap, preSuppliedImports } = ctx
 
   const fsPath = importName.slice(2)
+  if (ctx.verbose) {
+    console.log(`[Worker] Importing local file:`, fsPath)
+  }
   if (!ctx.fsMap[fsPath]) {
     throw new Error(`File "${fsPath}" not found`)
   }
