@@ -9,6 +9,13 @@ import type {
 export const createCircuitWebWorker = async (
   configuration: Partial<WebWorkerConfiguration>,
 ): Promise<CircuitWebWorker> => {
+  if (configuration.verbose) {
+    console.log(
+      "[Worker] Creating circuit web worker with config:",
+      configuration,
+    )
+  }
+
   const webWorker = Comlink.wrap<InternalWebWorkerApi>(
     new Worker(
       configuration.webWorkerUrl ??

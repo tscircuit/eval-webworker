@@ -10,7 +10,9 @@ export async function importEvalPath(
   ctx: ExecutionContext,
   depth = 0,
 ) {
-  console.log(`${"  ".repeat(depth)}➡️`, importName)
+  if (ctx.verbose) {
+    console.log(`[Worker] ${"  ".repeat(depth)}➡️`, importName)
+  }
   const { preSuppliedImports } = ctx
 
   if (preSuppliedImports[importName]) return
