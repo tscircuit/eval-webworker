@@ -32,5 +32,8 @@
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@tscircuit/core": "https://pkg.pr.new/tscircuit/core/@tscircuit/core@ed8967f"
   }
 }
