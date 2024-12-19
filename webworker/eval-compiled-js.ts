@@ -1,7 +1,9 @@
 export function evalCompiledJs(
   compiledCode: string,
   preSuppliedImports: Record<string, any>,
-  ctx: { emitError?: (error: { message: string, stack?: string }) => void } = {}
+  ctx: {
+    emitError?: (error: { message: string; stack?: string }) => void
+  } = {},
 ) {
   try {
     ;(globalThis as any).__tscircuit_require = (name: string) => {
@@ -25,7 +27,7 @@ export function evalCompiledJs(
     if (ctx.emitError) {
       ctx.emitError({
         message: error.message,
-        stack: error.stack
+        stack: error.stack,
       })
     }
     throw error

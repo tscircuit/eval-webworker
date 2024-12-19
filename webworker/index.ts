@@ -63,7 +63,7 @@ const webWorkerApi = {
     } catch (error: any) {
       webWorkerApi.emitError({
         message: error.message,
-        stack: error.stack
+        stack: error.stack,
       })
       throw error
     }
@@ -90,7 +90,7 @@ const webWorkerApi = {
     return executionContext.circuit.getCircuitJson()
   },
 
-  emitError: async (error: { message: string, stack?: string }) => {
+  emitError: async (error: { message: string; stack?: string }) => {
     if (webWorkerConfiguration.verbose) {
       console.error("[Worker] Evaluation error:", error)
     }
