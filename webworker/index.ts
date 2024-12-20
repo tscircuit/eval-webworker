@@ -94,7 +94,7 @@ const webWorkerApi = {
     if (webWorkerConfiguration.verbose) {
       console.error("[Worker] Evaluation error:", error)
     }
-    executionContext?.circuit.emit("eval_error", error)
+    executionContext?.circuit.emit("external:evalError", error)
   },
 } satisfies InternalWebWorkerApi
 
