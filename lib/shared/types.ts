@@ -16,7 +16,6 @@ export interface InternalWebWorkerApi {
   getCircuitJson: () => Promise<AnyCircuitElement[]>
   setSnippetsApiBaseUrl: (baseUrl: string) => Promise<void>
   on: (event: string, callback: (...args: any[]) => void) => void
-  emitError: (error: { message: string; stack?: string }) => void
 }
 
 export type CircuitWebWorker = {
