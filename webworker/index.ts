@@ -51,22 +51,14 @@ const webWorkerApi = {
   },
 
   async execute(code: string) {
-    try {
-      if (webWorkerConfiguration.verbose) {
-        console.log("[Worker] execute called with code length:", code.length)
-      }
-      executionContext = createExecutionContext(webWorkerConfiguration)
-      executionContext.fsMap["entrypoint.tsx"] = code
-      ;(globalThis as any).__tscircuit_circuit = executionContext.circuit
-
-      await importEvalPath("./entrypoint.tsx", executionContext)
-    } catch (error: any) {
-      webWorkerApi.emitError({
-        message: error.message,
-        stack: error.stack,
-      })
-      throw error
+    if (webWorkerConfiguration.verbose) {
+      console.log("[Worker] execute called with code length:", code.length)
     }
+    executionContext = createExecutionContext(webWorkerConfiguration)
+    executionContext.fsMap["entrypoint.tsx"] = code
+    ;(globalThis as any).__tscircuit_circuit = executionContext.circuit
+
+    await importEvalPath("./entrypoint.tsx", executionContext)
   },
 
   on: (event: string, callback: (...args: any[]) => void) => {
@@ -88,13 +80,6 @@ const webWorkerApi = {
       throw new Error("No circuit has been created")
     }
     return executionContext.circuit.getCircuitJson()
-  },
-
-  emitError: async (error: { message: string; stack?: string }) => {
-    if (webWorkerConfiguration.verbose) {
-      console.error("[Worker] Evaluation error:", error)
-    }
-    executionContext?.circuit.emit("external:evalError", error)
   },
 } satisfies InternalWebWorkerApi
 
