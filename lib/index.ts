@@ -6,6 +6,8 @@ import type {
   CircuitWebWorker,
 } from "./shared/types"
 
+export type { CircuitWebWorker, WebWorkerConfiguration }
+
 export const createCircuitWebWorker = async (
   configuration: Partial<WebWorkerConfiguration>,
 ): Promise<CircuitWebWorker> => {
