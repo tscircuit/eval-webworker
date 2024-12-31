@@ -1,4 +1,4 @@
-import { Circuit } from "@tscircuit/core"
+import { RootCircuit } from "@tscircuit/core"
 import type { WebWorkerConfiguration } from "lib/shared/types"
 import * as tscircuitCore from "@tscircuit/core"
 import * as React from "react"
@@ -8,12 +8,21 @@ export interface ExecutionContext extends WebWorkerConfiguration {
   fsMap: Record<string, string>
   entrypoint: string
   preSuppliedImports: Record<string, any>
-  circuit: Circuit
+  circuit: RootCircuit
 }
 
 export function createExecutionContext(
   webWorkerConfiguration: WebWorkerConfiguration,
+  opts: {
+    name?: string
+  } = {},
 ): ExecutionContext {
+  const circuit = new RootCircuit()
+
+  if (opts.name) {
+    circuit.name = opts.name
+  }
+
   return {
     fsMap: {},
     entrypoint: "",
@@ -26,7 +35,7 @@ export function createExecutionContext(
       // ignore type imports in getImportsFromCode
       "@tscircuit/props": {},
     },
-    circuit: new Circuit(),
+    circuit,
     ...webWorkerConfiguration,
   }
 }
