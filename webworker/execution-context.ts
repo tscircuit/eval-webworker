@@ -13,7 +13,16 @@ export interface ExecutionContext extends WebWorkerConfiguration {
 
 export function createExecutionContext(
   webWorkerConfiguration: WebWorkerConfiguration,
+  opts: {
+    name?: string
+  } = {},
 ): ExecutionContext {
+  const circuit = new RootCircuit()
+
+  if (opts.name) {
+    circuit.name = opts.name
+  }
+
   return {
     fsMap: {},
     entrypoint: "",
@@ -26,7 +35,7 @@ export function createExecutionContext(
       // ignore type imports in getImportsFromCode
       "@tscircuit/props": {},
     },
-    circuit: new RootCircuit(),
+    circuit,
     ...webWorkerConfiguration,
   }
 }

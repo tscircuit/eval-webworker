@@ -29,14 +29,18 @@ const webWorkerApi = {
   async executeWithFsMap(opts: {
     entrypoint: string
     fsMap: Record<string, string>
+    name?: string
   }): Promise<void> {
     if (webWorkerConfiguration.verbose) {
       console.log("[Worker] executeWithFsMap called with:", {
         entrypoint: opts.entrypoint,
         fsMapKeys: Object.keys(opts.fsMap),
+        name: opts.name,
       })
     }
-    executionContext = createExecutionContext(webWorkerConfiguration)
+    executionContext = createExecutionContext(webWorkerConfiguration, {
+      name: opts.name,
+    })
     executionContext.fsMap = normalizeFsMap(opts.fsMap)
     if (!executionContext.fsMap[opts.entrypoint]) {
       throw new Error(`Entrypoint "${opts.entrypoint}" not found`)
@@ -50,11 +54,11 @@ const webWorkerApi = {
     await importEvalPath(opts.entrypoint, executionContext)
   },
 
-  async execute(code: string) {
+  async execute(code: string, opts: { name?: string } = {}) {
     if (webWorkerConfiguration.verbose) {
       console.log("[Worker] execute called with code length:", code.length)
     }
-    executionContext = createExecutionContext(webWorkerConfiguration)
+    executionContext = createExecutionContext(webWorkerConfiguration, opts)
     executionContext.fsMap["entrypoint.tsx"] = code
     ;(globalThis as any).__tscircuit_circuit = executionContext.circuit
 
