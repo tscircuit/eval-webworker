@@ -1,7 +1,7 @@
 {
   "name": "@tscircuit/eval-webworker",
   "main": "dist/lib/index.js",
-  "version": "0.0.45",
+  "version": "0.0.46",
   "type": "module",
   "scripts": {
     "build": "bun run build:lib && bun run build:webworker && bun run build:blob-url",
