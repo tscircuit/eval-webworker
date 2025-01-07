@@ -11,6 +11,7 @@ import {
 } from "./execution-context"
 import { importEvalPath } from "./import-eval-path"
 import { normalizeFsMap } from "./normalize-fs-map"
+import type { RootCircuit } from "@tscircuit/core"
 
 globalThis.React = React
 
@@ -19,6 +20,16 @@ let executionContext: ExecutionContext | null = null
 const webWorkerConfiguration: WebWorkerConfiguration = {
   snippetsApiBaseUrl: "https://registry-api.tscircuit.com",
   verbose: false,
+}
+
+const eventListeners: Record<string, ((...args: any[]) => void)[]> = {}
+
+function bindEventListeners(circuit: RootCircuit) {
+  for (const event in eventListeners) {
+    for (const listener of eventListeners[event]) {
+      circuit.on(event as any, listener as any)
+    }
+  }
 }
 
 const webWorkerApi = {
@@ -41,6 +52,7 @@ const webWorkerApi = {
     executionContext = createExecutionContext(webWorkerConfiguration, {
       name: opts.name,
     })
+    bindEventListeners(executionContext.circuit)
     executionContext.fsMap = normalizeFsMap(opts.fsMap)
     if (!executionContext.fsMap[opts.entrypoint]) {
       throw new Error(`Entrypoint "${opts.entrypoint}" not found`)
@@ -59,6 +71,7 @@ const webWorkerApi = {
       console.log("[Worker] execute called with code length:", code.length)
     }
     executionContext = createExecutionContext(webWorkerConfiguration, opts)
+    bindEventListeners(executionContext.circuit)
     executionContext.fsMap["entrypoint.tsx"] = code
     ;(globalThis as any).__tscircuit_circuit = executionContext.circuit
 
@@ -66,10 +79,9 @@ const webWorkerApi = {
   },
 
   on: (event: string, callback: (...args: any[]) => void) => {
-    if (!executionContext) {
-      throw new Error("No circuit has been created")
-    }
-    executionContext.circuit.on(event as any, callback)
+    eventListeners[event] ??= []
+    eventListeners[event].push(callback)
+    executionContext?.circuit.on(event as any, callback)
   },
 
   renderUntilSettled: async (): Promise<void> => {

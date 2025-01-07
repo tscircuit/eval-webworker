@@ -32,5 +32,8 @@ export type CircuitWebWorker = {
   }) => Promise<void>
   renderUntilSettled: () => Promise<void>
   getCircuitJson: () => Promise<AnyCircuitElement[]>
-  on: (event: string, callback: (...args: any[]) => void) => void
+  on: (
+    event: "renderable:renderLifecycle:anyEvent",
+    callback: (...args: any[]) => void,
+  ) => void
 }
