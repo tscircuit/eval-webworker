@@ -33,7 +33,11 @@ export type CircuitWebWorker = {
   renderUntilSettled: () => Promise<void>
   getCircuitJson: () => Promise<AnyCircuitElement[]>
   on: (
-    event: "renderable:renderLifecycle:anyEvent",
+    event:
+      | "renderable:renderLifecycle:anyEvent"
+      | `asyncEffect:start`
+      | `asyncEffect:end`
+      | `renderable:renderLifecycle:${string}`,
     callback: (...args: any[]) => void,
   ) => void
 }
