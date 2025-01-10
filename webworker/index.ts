@@ -97,6 +97,27 @@ const webWorkerApi = {
     }
     return executionContext.circuit.getCircuitJson()
   },
+
+  clearEventListeners: () => {
+    // If there's an active circuit, try to unbind all listeners
+    if (executionContext?.circuit) {
+      for (const event in eventListeners) {
+        for (const listener of eventListeners[event]) {
+          const circuit = executionContext.circuit as unknown as {
+            removeListener?: (event: string, listener: Function) => void
+          }
+          if (typeof circuit.removeListener === "function") {
+            circuit.removeListener(event, listener)
+          }
+        }
+      }
+    }
+
+    // Clear all stored event listeners
+    for (const event in eventListeners) {
+      delete eventListeners[event]
+    }
+  },
 } satisfies InternalWebWorkerApi
 
 Comlink.expose(webWorkerApi)

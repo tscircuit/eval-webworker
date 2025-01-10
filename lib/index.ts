@@ -32,6 +32,7 @@ export const createCircuitWebWorker = async (
 
   // Create a wrapper that handles events directly through circuit instance
   const wrapper: CircuitWebWorker = {
+    clearEventListeners: webWorker.clearEventListeners.bind(webWorker),
     execute: webWorker.execute.bind(webWorker),
     executeWithFsMap: webWorker.executeWithFsMap.bind(webWorker),
     renderUntilSettled: webWorker.renderUntilSettled.bind(webWorker),

@@ -22,4 +22,22 @@ test("example5-event-recording", async () => {
   await circuitWebWorker.renderUntilSettled()
 
   expect(events.length).toBeGreaterThan(0)
+  const initialEventCount = events.length
+
+  // Clear event listeners
+  circuitWebWorker.clearEventListeners()
+
+  // Add another component to trigger more events
+  await circuitWebWorker.execute(`
+    circuit.add(
+      <board width="10mm" height="10mm">
+        <resistor name="R2" resistance="2k" footprint="0402" />
+      </board>
+    )
+    `)
+
+  await circuitWebWorker.renderUntilSettled()
+
+  // Verify no new events were recorded after clearing listeners
+  expect(events.length).toBe(initialEventCount)
 })
