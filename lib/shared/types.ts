@@ -22,6 +22,7 @@ export interface InternalWebWorkerApi {
   getCircuitJson: () => Promise<AnyCircuitElement[]>
   setSnippetsApiBaseUrl: (baseUrl: string) => Promise<void>
   on: (event: string, callback: (...args: any[]) => void) => void
+  clearEventListeners: () => void
 }
 
 export type CircuitWebWorker = {
@@ -40,4 +41,5 @@ export type CircuitWebWorker = {
       | `renderable:renderLifecycle:${string}`,
     callback: (...args: any[]) => void,
   ) => void
+  clearEventListeners: () => void
 }

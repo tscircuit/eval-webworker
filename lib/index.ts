@@ -40,6 +40,7 @@ export const createCircuitWebWorker = async (
       const proxiedCallback = Comlink.proxy(callback)
       webWorker.on(event, proxiedCallback)
     },
+    clearEventListeners: webWorker.clearEventListeners.bind(webWorker),
   }
 
   return wrapper
