@@ -19,6 +19,7 @@ let executionContext: ExecutionContext | null = null
 
 const webWorkerConfiguration: WebWorkerConfiguration = {
   snippetsApiBaseUrl: "https://registry-api.tscircuit.com",
+  cjsRegistryUrl: "https://cjs.tscircuit.com",
   verbose: false,
 }
 

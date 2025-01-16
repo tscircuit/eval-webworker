@@ -12,30 +12,19 @@ export async function importSnippet(
 ) {
   const { preSuppliedImports } = ctx
   const fullSnippetName = importName.replace("@tsci/", "").replace(".", "/")
-  const { snippet: importedSnippet, error } = await fetch(
-    `${ctx.snippetsApiBaseUrl}/snippets/get?name=${fullSnippetName}`,
-  )
-    .then((res) => res.json())
-    .catch((e) => ({ error: e }))
+
+  const { cjs, error } = await fetch(`${ctx.cjsRegistryUrl}/${fullSnippetName}`)
+    .then(async (res) => ({ cjs: await res.text(), error: null }))
+    .catch((e) => ({ error: e, cjs: null }))
 
   if (error) {
     console.error("Error fetching import", importName, error)
     return
   }
 
-  const { compiled_js, code } = importedSnippet
-
-  const importNames = getImportsFromCode(code!)
-
-  for (const importName of importNames) {
-    if (!preSuppliedImports[importName]) {
-      await importEvalPath(importName, ctx, depth + 1)
-    }
-  }
-
   try {
     preSuppliedImports[importName] = evalCompiledJs(
-      compiled_js,
+      cjs!,
       preSuppliedImports,
     ).exports
   } catch (e) {

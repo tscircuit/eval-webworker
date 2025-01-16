@@ -2,6 +2,7 @@ import type { AnyCircuitElement } from "circuit-json"
 
 export interface WebWorkerConfiguration {
   snippetsApiBaseUrl: string
+  cjsRegistryUrl: string
   webWorkerUrl?: URL | string
   verbose?: boolean
 }
