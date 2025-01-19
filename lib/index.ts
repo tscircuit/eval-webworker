@@ -18,13 +18,12 @@ export const createCircuitWebWorker = async (
     )
   }
 
-  const webWorker = Comlink.wrap<InternalWebWorkerApi>(
-    new Worker(
-      configuration.webWorkerUrl ??
-        "https://unpkg.com/@tscircuit/eval-webworker/dist/webworker/index.js",
-      { type: "module" },
-    ),
+  const rawWorker = new Worker(
+    configuration.webWorkerUrl ??
+      "https://unpkg.com/@tscircuit/eval-webworker/dist/webworker/index.js",
+    { type: "module" },
   )
+  const webWorker = Comlink.wrap<InternalWebWorkerApi>(rawWorker)
 
   if (configuration.snippetsApiBaseUrl) {
     await webWorker.setSnippetsApiBaseUrl(configuration.snippetsApiBaseUrl)
@@ -40,6 +39,10 @@ export const createCircuitWebWorker = async (
     on: (event: string, callback: (...args: any[]) => void) => {
       const proxiedCallback = Comlink.proxy(callback)
       webWorker.on(event, proxiedCallback)
+    },
+    kill: async () => {
+      webWorker[Comlink.releaseProxy]()
+      rawWorker.terminate()
     },
   }
 
