@@ -3,6 +3,7 @@ import type { WebWorkerConfiguration } from "lib/shared/types"
 import * as tscircuitCore from "@tscircuit/core"
 import * as React from "react"
 import * as jscadFiber from "jscad-fiber"
+import * as tscircuitMathUtils from "@tscircuit/math-utils"
 
 export interface ExecutionContext extends WebWorkerConfiguration {
   fsMap: Record<string, string>
@@ -28,6 +29,7 @@ export function createExecutionContext(
     entrypoint: "",
     preSuppliedImports: {
       "@tscircuit/core": tscircuitCore,
+      "@tscircuit/math-utils": tscircuitMathUtils,
       react: React,
       "jscad-fiber": jscadFiber,
 
