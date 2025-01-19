@@ -18,6 +18,8 @@ export const createCircuitWebWorker = async (
     )
   }
 
+  // TODO Adapt to use a fetch then blob url transform
+
   const rawWorker = new Worker(
     configuration.webWorkerUrl ??
       "https://unpkg.com/@tscircuit/eval-webworker/dist/webworker/index.js",
