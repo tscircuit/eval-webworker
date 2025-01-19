@@ -119,6 +119,10 @@ const webWorkerApi = {
       delete eventListeners[event]
     }
   },
+
+  // Required by InternalWebWorkerApi interface but never called
+  // Worker termination is handled by the main thread
+  kill: async () => {},
 } satisfies InternalWebWorkerApi
 
 Comlink.expose(webWorkerApi)
