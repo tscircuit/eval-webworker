@@ -24,6 +24,7 @@ export interface InternalWebWorkerApi {
   setSnippetsApiBaseUrl: (baseUrl: string) => Promise<void>
   on: (event: string, callback: (...args: any[]) => void) => void
   clearEventListeners: () => void
+  kill: () => Promise<void>
 }
 
 export type CircuitWebWorker = {
@@ -43,4 +44,5 @@ export type CircuitWebWorker = {
     callback: (...args: any[]) => void,
   ) => void
   clearEventListeners: () => void
+  kill: () => Promise<void>
 }

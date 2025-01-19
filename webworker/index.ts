@@ -119,6 +119,11 @@ const webWorkerApi = {
       delete eventListeners[event]
     }
   },
+
+  // No-op kill method to satisfy interface
+  kill: async () => {},
+
+
 } satisfies InternalWebWorkerApi
 
 Comlink.expose(webWorkerApi)
