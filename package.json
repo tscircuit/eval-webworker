@@ -19,7 +19,7 @@
   "devDependencies": {
     "@babel/standalone": "^7.26.2",
     "@biomejs/biome": "^1.9.4",
-    "@tscircuit/core": "^0.0.272",
+    "@tscircuit/core": "^0.0.273",
     "@tscircuit/math-utils": "^0.0.10",
     "@tscircuit/prompt-benchmarks": "^0.0.20",
     "@types/babel__standalone": "^7.1.9",
