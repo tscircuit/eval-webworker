@@ -3,7 +3,11 @@ import type { AnyCircuitElement } from "circuit-json"
 export interface WebWorkerConfiguration {
   snippetsApiBaseUrl: string
   cjsRegistryUrl: string
+  /**
+   * @deprecated, renamed to webWorkerBlobUrl
+   */
   webWorkerUrl?: URL | string
+  webWorkerBlobUrl?: URL | string
   verbose?: boolean
 }
 
