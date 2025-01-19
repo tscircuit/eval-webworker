@@ -18,30 +18,37 @@ export const createCircuitWebWorker = async (
     )
   }
 
-  const rawWorker = new Worker(
-    configuration.webWorkerUrl ??
-      "https://unpkg.com/@tscircuit/eval-webworker/dist/webworker/index.js",
-    { type: "module" },
-  )
-  const webWorker = Comlink.wrap<InternalWebWorkerApi>(rawWorker)
+  let workerBlobUrl =
+    configuration.webWorkerBlobUrl ?? configuration.webWorkerUrl
+
+  if (!workerBlobUrl) {
+    const cdnUrl =
+      "https://cdn.jsdelivr.net/npm/@tscircuit/eval-webworker/dist/webworker/index.js"
+
+    const workerBlob = await fetch(cdnUrl).then((res) => res.blob())
+    workerBlobUrl = URL.createObjectURL(workerBlob)
+  }
+
+  const rawWorker = new Worker(workerBlobUrl, { type: "module" })
+  const comlinkWorker = Comlink.wrap<InternalWebWorkerApi>(rawWorker)
 
   if (configuration.snippetsApiBaseUrl) {
-    await webWorker.setSnippetsApiBaseUrl(configuration.snippetsApiBaseUrl)
+    await comlinkWorker.setSnippetsApiBaseUrl(configuration.snippetsApiBaseUrl)
   }
 
   // Create a wrapper that handles events directly through circuit instance
   const wrapper: CircuitWebWorker = {
-    clearEventListeners: webWorker.clearEventListeners.bind(webWorker),
-    execute: webWorker.execute.bind(webWorker),
-    executeWithFsMap: webWorker.executeWithFsMap.bind(webWorker),
-    renderUntilSettled: webWorker.renderUntilSettled.bind(webWorker),
-    getCircuitJson: webWorker.getCircuitJson.bind(webWorker),
+    clearEventListeners: comlinkWorker.clearEventListeners.bind(comlinkWorker),
+    execute: comlinkWorker.execute.bind(comlinkWorker),
+    executeWithFsMap: comlinkWorker.executeWithFsMap.bind(comlinkWorker),
+    renderUntilSettled: comlinkWorker.renderUntilSettled.bind(comlinkWorker),
+    getCircuitJson: comlinkWorker.getCircuitJson.bind(comlinkWorker),
     on: (event: string, callback: (...args: any[]) => void) => {
       const proxiedCallback = Comlink.proxy(callback)
-      webWorker.on(event, proxiedCallback)
+      comlinkWorker.on(event, proxiedCallback)
     },
     kill: async () => {
-      webWorker[Comlink.releaseProxy]()
+      comlinkWorker[Comlink.releaseProxy]()
       rawWorker.terminate()
     },
   }
