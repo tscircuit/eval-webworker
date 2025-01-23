@@ -18,6 +18,8 @@ export function createExecutionContext(
     name?: string
   } = {},
 ): ExecutionContext {
+  globalThis.React = React
+
   const circuit = new RootCircuit()
 
   if (opts.name) {

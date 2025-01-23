@@ -17,7 +17,7 @@ globalThis.React = React
 
 let executionContext: ExecutionContext | null = null
 
-const webWorkerConfiguration: WebWorkerConfiguration = {
+const circuitRunnerConfiguration: WebWorkerConfiguration = {
   snippetsApiBaseUrl: "https://registry-api.tscircuit.com",
   cjsRegistryUrl: "https://cjs.tscircuit.com",
   verbose: false,
@@ -35,7 +35,7 @@ function bindEventListeners(circuit: RootCircuit) {
 
 const webWorkerApi = {
   setSnippetsApiBaseUrl: async (baseUrl: string) => {
-    webWorkerConfiguration.snippetsApiBaseUrl = baseUrl
+    circuitRunnerConfiguration.snippetsApiBaseUrl = baseUrl
   },
 
   async executeWithFsMap(opts: {
@@ -43,14 +43,14 @@ const webWorkerApi = {
     fsMap: Record<string, string>
     name?: string
   }): Promise<void> {
-    if (webWorkerConfiguration.verbose) {
+    if (circuitRunnerConfiguration.verbose) {
       console.log("[Worker] executeWithFsMap called with:", {
         entrypoint: opts.entrypoint,
         fsMapKeys: Object.keys(opts.fsMap),
         name: opts.name,
       })
     }
-    executionContext = createExecutionContext(webWorkerConfiguration, {
+    executionContext = createExecutionContext(circuitRunnerConfiguration, {
       name: opts.name,
     })
     bindEventListeners(executionContext.circuit)
@@ -68,10 +68,10 @@ const webWorkerApi = {
   },
 
   async execute(code: string, opts: { name?: string } = {}) {
-    if (webWorkerConfiguration.verbose) {
+    if (circuitRunnerConfiguration.verbose) {
       console.log("[Worker] execute called with code length:", code.length)
     }
-    executionContext = createExecutionContext(webWorkerConfiguration, opts)
+    executionContext = createExecutionContext(circuitRunnerConfiguration, opts)
     bindEventListeners(executionContext.circuit)
     executionContext.fsMap["entrypoint.tsx"] = code
     ;(globalThis as any).__tscircuit_circuit = executionContext.circuit
