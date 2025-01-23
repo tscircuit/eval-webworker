@@ -14,10 +14,22 @@
     "format:check": "biome format ."
   },
   "exports": {
-    ".": "./dist/lib/index.js",
-    "./worker": "./dist/webworker/index.js",
-    "./blob-url": "./dist/blob-url.js",
-    "./eval": "./dist/eval/index.js"
+    ".": {
+      "types": "./dist/lib/index.d.ts",
+      "import": "./dist/lib/index.js"
+    },
+    "./worker": {
+      "types": "./dist/webworker/index.d.ts",
+      "import": "./dist/webworker/index.js"
+    },
+    "./blob-url": {
+      "types": "./dist/blob-url.d.ts",
+      "import": "./dist/blob-url.js"
+    },
+    "./eval": {
+      "types": "./dist/eval/index.d.ts",
+      "import": "./dist/eval/index.js"
+    }
   },
   "devDependencies": {
     "@babel/standalone": "^7.26.2",
