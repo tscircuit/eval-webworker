@@ -1,17 +1,23 @@
 import type { AnyCircuitElement } from "circuit-json"
 
-export interface WebWorkerConfiguration {
+export interface CircuitRunnerConfiguration {
   snippetsApiBaseUrl: string
   cjsRegistryUrl: string
+  verbose?: boolean
+}
+
+export interface WebWorkerConfiguration extends CircuitRunnerConfiguration {
   /**
    * @deprecated, renamed to webWorkerBlobUrl
    */
   webWorkerUrl?: URL | string
   webWorkerBlobUrl?: URL | string
-  verbose?: boolean
 }
 
-export interface InternalWebWorkerApi {
+/**
+ * API for the CircuitRunner class, used for eval'ing circuits
+ */
+export interface CircuitRunnerApi {
   execute: (
     code: string,
     opts?: {
@@ -30,6 +36,11 @@ export interface InternalWebWorkerApi {
   clearEventListeners: () => void
   kill: () => Promise<void>
 }
+
+/**
+ * @deprecated, use CircuitRunnerApi instead
+ */
+export type InternalWebWorkerApi = CircuitRunnerApi
 
 export type CircuitWebWorker = {
   execute: (code: string) => Promise<void>
