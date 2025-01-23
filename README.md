@@ -8,7 +8,9 @@ transpilation and execution, so you just need to send the code to be executed.
 The `circuit` object from `@tscircuit/core` is already exposed on the global
 scope. All imports from `@tsci/*` are automatically handled.
 
-## Usage
+## Usage Options
+
+### 1. Using CircuitWebWorker (Web Worker)
 
 ```tsx
 import { createCircuitWebWorker } from "@tscircuit/eval-webworker"
@@ -30,7 +32,32 @@ await circuitWebWorker.renderUntilSettled()
 const circuitJson = await circuitWebWorker.getCircuitJson()
 ```
 
-## Using Virtual Filesystem
+### 2. Using CircuitRunner Directly
+
+For simple cases where you don't need web worker isolation, you can use CircuitRunner directly in the main thread:
+
+```tsx
+import { CircuitRunner } from "@tscircuit/eval-webworker"
+
+const circuitRunner = new CircuitRunner()
+
+await circuitRunner.execute(`
+import { RedLed } from "@tsci/seveibar.red-led"
+
+circuit.add(
+  <board width="10mm" height="10mm">
+    <RedLed name="LED1" />
+  </board>
+)`)
+
+await circuitRunner.renderUntilSettled()
+
+const circuitJson = await circuitRunner.getCircuitJson()
+// Validate circuit elements
+const led = circuitJson.find((el) => el.name === "LED1")
+```
+
+### 3. Using Virtual Filesystem
 
 You can also execute code using a virtual filesystem, which is useful when you have multiple files or components:
 
@@ -56,15 +83,32 @@ await circuitWebWorker.executeWithFsMap({
       export const MyLed = ({ name }) => {
         return <RedLed name={name} />
       }
-    `
+    `,
   },
-  entrypoint: "entrypoint.tsx"
+  entrypoint: "entrypoint.tsx",
 })
 
 await circuitWebWorker.renderUntilSettled()
 
 const circuitJson = await circuitWebWorker.getCircuitJson()
 ```
+
+## When to Use Which Approach
+
+**CircuitRunner (Direct Execution)**
+
+- ✅ Simple debugging
+- ✅ No worker setup required
+- ❌ Blocks main thread
+- ❌ No isolation from host environment
+
+**CircuitWebWorker (Web Worker)**
+
+- ✅ Non-blocking execution
+- ✅ Isolated environment
+- ✅ Better for production use
+- ❌ More complex setup
+- ❌ Comlink overhead for communication
 
 ## Why use a web worker?
 
