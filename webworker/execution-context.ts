@@ -29,6 +29,7 @@ export function createExecutionContext(
     entrypoint: "",
     preSuppliedImports: {
       "@tscircuit/core": tscircuitCore,
+      tscircuit: tscircuitCore,
       "@tscircuit/math-utils": tscircuitMathUtils,
       react: React,
       "jscad-fiber": jscadFiber,
