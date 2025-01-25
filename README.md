@@ -1,9 +1,8 @@
-# @tscircuit/eval-webworker
+# @tscircuit/eval
 
-A web worker that can be used for tscircuit execution.
-
-The WebWorker contains a full tscircuit runtime environment, including babel
-transpilation and execution, so you just need to send the code to be executed.
+Evaluate code in a full tscircuit runtime environment, including babel
+transpilation and execution, so you just need to send the code to be executed
+with automatic handling of imports from `@tsci/*`
 
 The `circuit` object from `@tscircuit/core` is already exposed on the global
 scope. All imports from `@tsci/*` are automatically handled.
